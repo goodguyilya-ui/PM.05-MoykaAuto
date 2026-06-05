@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Мои заявки</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="logo">
+     AutoService CRM
+</div>
+<nav>
+    <a href="/applications">Мои заявки</a>
+    <a href="/create_application">Новая заявка</a>
+    <a href="/reviews">Отзывы</a>
+    <a href="/admin">Админ-панель</a>
+    <a href="/">Выход</a>
+</nav>
+
+<h1>Мои заявки</h1>
+
+<table id="table">
+
+</table>
+
+<script>
+
+loadApplications();
+
+async function loadApplications(){
+
+    const userId =
+        localStorage.getItem("user_id");
+
+    const response =
+        await fetch(
+            `/api/applications/my/${userId}`
+        );
+
+    const data =
+        await response.json();
+
+    let html = `
+        <tr>
+            <th>ID</th>
+            <th>Автомобиль</th>
+            <th>VIN</th>
+            <th>Услуга</th>
+            <th>Дата</th>
+            <th>Статус</th>
+        </tr>
+    `;
+
+    data.forEach(item => {
+
+        html += `
+            <tr>
+                <td>${item.id}</td>
+                <td>${item.car_model}</td>
+                <td>${item.vin}</td>
+                <td>${item.service_type}</td>
+                <td>${item.start_date}</td>
+                <td>${item.status}</td>
+            </tr>
+        `;
+
+    });
+
+    document.getElementById("table").innerHTML = html;
+
+}
+
+</script>
+
+</body>
+</html>

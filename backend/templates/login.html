@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Авторизация</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="logo">
+     AutoService CRM
+</div>
+<nav>
+    <a href="/">Вход</a>
+    <a href="/register">Регистрация</a>
+</nav>
+
+<h1>Авторизация</h1>
+
+<input id="login" placeholder="Логин">
+<br><br>
+
+<input id="password" type="password" placeholder="Пароль">
+<br><br>
+
+<button onclick="loginUser()">
+    Войти
+</button>
+
+<script>
+
+async function loginUser(){
+
+    const response = await fetch(
+        "http://127.0.0.1:5000/api/login",
+        {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                login:document.getElementById("login").value,
+                password:document.getElementById("password").value
+            })
+        }
+    );
+
+    const data = await response.json();
+
+    if(data.user_id){
+
+        localStorage.setItem(
+            "user_id",
+            data.user_id
+        );
+
+        localStorage.setItem(
+            "role_id",
+            data.role_id
+        );
+
+        if(data.role_id == 1){
+            window.location.href="/admin";
+        }
+        else{
+            window.location.href="/applications";
+        }
+
+    }
+    else{
+        alert(data.error);
+    }
+}
+
+</script>
+
+</body>
+</html>

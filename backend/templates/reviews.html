@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Отзывы</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="logo">
+     AutoService CRM
+</div>
+<div class="container">
+
+<nav>
+    <a href="/applications">Мои заявки</a>
+    <a href="/create_application">Новая заявка</a>
+    <a href="/reviews">Отзывы</a>
+    <a href="/admin">Админ-панель</a>
+</nav>
+
+<div class="card">
+
+<h1>Отзывы клиентов</h1>
+
+<textarea
+id="review"
+rows="5"
+placeholder="Оставьте отзыв">
+</textarea>
+
+<br><br>
+
+<button onclick="saveReview()">
+Отправить отзыв
+</button>
+
+<hr style="margin:20px 0;">
+
+<div id="reviewsList"></div>
+
+</div>
+
+</div>
+
+<script>
+
+loadReviews();
+
+async function saveReview(){
+
+    const response =
+        await fetch(
+            "/api/reviews",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    user_id:
+                        localStorage.getItem("user_id"),
+                    text:
+                        document.getElementById("review").value
+                })
+            }
+        );
+
+    const data =
+        await response.json();
+
+    alert(data.message);
+
+    document.getElementById("review").value = "";
+
+    loadReviews();
+}
+
+async function loadReviews(){
+
+    const response =
+        await fetch("/api/reviews");
+
+    const data =
+        await response.json();
+
+    let html = "";
+
+    data.forEach(item => {
+
+        html += `
+            <div class="card"
+                 style="margin-bottom:15px">
+
+                <h3>${item.full_name}</h3>
+
+                <p>${item.text}</p>
+
+                <small>
+                    ${item.created_at}
+                </small>
+
+            </div>
+        `;
+
+    });
+
+    document.getElementById(
+        "reviewsList"
+    ).innerHTML = html;
+}
+
+</script>
+
+</body>
+</html>

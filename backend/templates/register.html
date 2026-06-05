@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<nav>
+    <a href="/">Вход</a>
+    <a href="/register">Регистрация</a>
+</nav>
+
+<h1>Регистрация</h1>
+
+<input id="login" placeholder="Логин">
+<br><br>
+
+<input id="password" type="password" placeholder="Пароль">
+<br><br>
+
+<input id="full_name" placeholder="ФИО">
+<br><br>
+
+<input id="phone" placeholder="Телефон">
+<br><br>
+
+<input id="email" placeholder="Email">
+<br><br>
+
+<button onclick="registerUser()">
+    Зарегистрироваться
+</button>
+
+<script>
+
+async function registerUser(){
+
+    const response = await fetch(
+        "http://127.0.0.1:5000/api/register",
+        {
+            method:"POST",
+            headers:{
+                "Content-Type":"application/json"
+            },
+            body:JSON.stringify({
+                login:document.getElementById("login").value,
+                password:document.getElementById("password").value,
+                full_name:document.getElementById("full_name").value,
+                phone:document.getElementById("phone").value,
+                email:document.getElementById("email").value
+            })
+        }
+    );
+
+    const data = await response.json();
+
+    if(data.message){
+        alert(data.message);
+        window.location.href="/";
+    }
+    else{
+        alert(data.error);
+    }
+
+}
+
+</script>
+
+</body>
+</html>

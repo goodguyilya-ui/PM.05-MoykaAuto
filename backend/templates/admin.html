@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Админ-панель</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="logo">
+     AutoService CRM
+</div>
+<nav>
+    <a href="/applications">Мои заявки</a>
+    <a href="/create_application">Новая заявка</a>
+    <a href="/reviews">Отзывы</a>
+    <a href="/admin">Админ-панель</a>
+    <a href="/">Выход</a>
+</nav>
+
+<h1>Все заявки</h1>
+
+<table id="table"></table>
+
+<script>
+
+load();
+
+async function load(){
+
+    const response =
+        await fetch("/api/admin/applications");
+
+    const data =
+        await response.json();
+
+    let html = `
+    <tr>
+        <th>ID</th>
+        <th>Клиент</th>
+        <th>Авто</th>
+        <th>VIN</th>
+        <th>Услуга</th>
+        <th>Статус</th>
+        <th>Изменить</th>
+    </tr>
+    `;
+
+    data.forEach(item => {
+
+        html += `
+        <tr>
+            <td>${item.id}</td>
+            <td>${item.full_name}</td>
+            <td>${item.car_model}</td>
+            <td>${item.vin}</td>
+            <td>${item.service_type}</td>
+
+            <td>${item.status}</td>
+
+            <td>
+
+                <select id="status_${item.id}">
+                    <option value="1">Новая</option>
+                    <option value="2">В работе</option>
+                    <option value="3">Ожидает запчасти</option>
+                    <option value="4">Завершена</option>
+                    <option value="5">Отменена</option>
+                </select>
+
+                <button onclick="changeStatus(${item.id})">
+                    Сохранить
+                </button>
+
+            </td>
+
+        </tr>
+        `;
+
+    });
+
+    document.getElementById("table").innerHTML = html;
+
+}
+
+async function changeStatus(id){
+
+    const statusId =
+        document.getElementById(
+            `status_${id}`
+        ).value;
+
+    const response =
+        await fetch(
+            `/api/admin/applications/${id}/status`,
+            {
+                method:"PATCH",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    status_id: statusId
+                })
+            }
+        );
+
+    const data =
+        await response.json();
+
+    alert(data.message);
+
+    load();
+
+}
+
+</script>
+
+</body>
+</html>
