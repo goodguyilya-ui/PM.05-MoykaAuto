@@ -228,12 +228,14 @@ def my_applications(user_id):
             a.car_model,
             a.vin,
             a.service_type,
+            a.description,
             a.start_date,
             s.name AS status
         FROM applications a
         JOIN application_statuses s
             ON s.id = a.status_id
         WHERE a.user_id = ?
+        ORDER BY a.id DESC
     """, (user_id,))
 
     rows = [dict(row) for row in cur.fetchall()]
@@ -309,6 +311,29 @@ def change_status(app_id):
         "message": "Статус обновлён"
     })
 
+# =====================================
+# удаление
+# =====================================
+@app.route(
+    "/api/admin/applications/<int:app_id>",
+    methods=["DELETE"]
+)
+def delete_application(app_id):
+
+    conn = get_db()
+    cur = conn.cursor()
+
+    cur.execute(
+        "DELETE FROM applications WHERE id = ?",
+        (app_id,)
+    )
+
+    conn.commit()
+    conn.close()
+
+    return jsonify({
+        "message": "Заявка удалена"
+    })
 # =====================================
 # ОТЗЫВЫ
 # =====================================

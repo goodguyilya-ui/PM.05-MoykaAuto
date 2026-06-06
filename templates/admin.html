@@ -1,14 +1,27 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<title>Админ-панель</title>
-<link rel="stylesheet" href="/static/style.css">
+    <meta charset="UTF-8">
+    <title>Админ-панель</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+<script>
+
+const roleId = localStorage.getItem("role_id");
+
+if(roleId != 1){
+
+    alert("Доступ запрещён");
+
+    window.location.href = "/applications";
+}
+
+</script>
 <div class="logo">
-     AutoService CRM
+    AutoService CRM
 </div>
+
 <nav>
     <a href="/applications">Мои заявки</a>
     <a href="/create_application">Новая заявка</a>
@@ -25,23 +38,22 @@
 
 load();
 
-async function load(){
+async function load() {
 
-    const response =
-        await fetch("/api/admin/applications");
-
-    const data =
-        await response.json();
+    const response = await fetch("/api/admin/applications");
+    const data = await response.json();
 
     let html = `
     <tr>
         <th>ID</th>
         <th>Клиент</th>
-        <th>Авто</th>
+        <th>Автомобиль</th>
         <th>VIN</th>
         <th>Услуга</th>
+        <th>Описание</th>
+        <th>Дата</th>
         <th>Статус</th>
-        <th>Изменить</th>
+        <th>Действия</th>
     </tr>
     `;
 
@@ -54,7 +66,8 @@ async function load(){
             <td>${item.car_model}</td>
             <td>${item.vin}</td>
             <td>${item.service_type}</td>
-
+            <td>${item.description || "-"}</td>
+            <td>${item.start_date}</td>
             <td>${item.status}</td>
 
             <td>
@@ -71,45 +84,61 @@ async function load(){
                     Сохранить
                 </button>
 
-            </td>
+                <button onclick="deleteApplication(${item.id})">
+                    Удалить
+                </button>
 
+            </td>
         </tr>
         `;
-
     });
 
     document.getElementById("table").innerHTML = html;
-
 }
 
-async function changeStatus(id){
+async function changeStatus(id) {
 
     const statusId =
-        document.getElementById(
-            `status_${id}`
-        ).value;
+        document.getElementById(`status_${id}`).value;
 
-    const response =
-        await fetch(
-            `/api/admin/applications/${id}/status`,
-            {
-                method:"PATCH",
-                headers:{
-                    "Content-Type":"application/json"
-                },
-                body:JSON.stringify({
-                    status_id: statusId
-                })
-            }
-        );
+    const response = await fetch(
+        `/api/admin/applications/${id}/status`,
+        {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                status_id: statusId
+            })
+        }
+    );
 
-    const data =
-        await response.json();
+    const data = await response.json();
 
     alert(data.message);
 
     load();
+}
 
+async function deleteApplication(id) {
+
+    if (!confirm("Удалить заявку?")) {
+        return;
+    }
+
+    const response = await fetch(
+        `/api/admin/applications/${id}`,
+        {
+            method: "DELETE"
+        }
+    );
+
+    const data = await response.json();
+
+    alert(data.message);
+
+    load();
 }
 
 </script>

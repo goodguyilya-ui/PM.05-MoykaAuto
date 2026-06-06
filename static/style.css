@@ -122,3 +122,22 @@ tr:hover{
 .form-group{
     margin-bottom:15px;
 }
+.status-new{
+    color:#2563eb;
+    font-weight:bold;
+}
+
+.status-work{
+    color:#f59e0b;
+    font-weight:bold;
+}
+
+.status-done{
+    color:#10b981;
+    font-weight:bold;
+}
+
+.status-cancel{
+    color:#ef4444;
+    font-weight:bold;
+}

@@ -6,36 +6,63 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
+
 <div class="logo">
-     AutoService CRM
+    AutoService CRM
 </div>
-<nav>
-    <a href="/applications">Мои заявки</a>
-    <a href="/create_application">Новая заявка</a>
-    <a href="/reviews">Отзывы</a>
-    <a href="/admin">Админ-панель</a>
-    <a href="/">Выход</a>
-</nav>
+
+<nav id="menu"></nav>
 
 <h1>Мои заявки</h1>
 
-<table id="table">
-
-</table>
+<table id="table"></table>
 
 <script>
 
+// ---------- МЕНЮ ----------
+
+const roleId = localStorage.getItem("role_id");
+
+let menu = `
+    <a href="/applications">Мои заявки</a>
+    <a href="/create_application">Новая заявка</a>
+    <a href="/reviews">Отзывы</a>
+`;
+
+if (roleId === "1") {
+    menu += `
+        <a href="/admin">Админ-панель</a>
+    `;
+}
+
+menu += `
+    <a href="/" onclick="logout()">Выход</a>
+`;
+
+document.getElementById("menu").innerHTML = menu;
+
+// ---------- ВЫХОД ----------
+
+function logout() {
+    localStorage.clear();
+}
+
+// ---------- ЗАЯВКИ ----------
+
 loadApplications();
 
-async function loadApplications(){
+async function loadApplications() {
 
-    const userId =
-        localStorage.getItem("user_id");
+    const userId = localStorage.getItem("user_id");
+
+    if (!userId) {
+        alert("Сначала выполните вход");
+        window.location.href = "/";
+        return;
+    }
 
     const response =
-        await fetch(
-            `/api/applications/my/${userId}`
-        );
+        await fetch(`/api/applications/my/${userId}`);
 
     const data =
         await response.json();
@@ -46,6 +73,7 @@ async function loadApplications(){
             <th>Автомобиль</th>
             <th>VIN</th>
             <th>Услуга</th>
+            <th>Описание</th>
             <th>Дата</th>
             <th>Статус</th>
         </tr>
@@ -59,6 +87,7 @@ async function loadApplications(){
                 <td>${item.car_model}</td>
                 <td>${item.vin}</td>
                 <td>${item.service_type}</td>
+                <td>${item.description || "-"}</td>
                 <td>${item.start_date}</td>
                 <td>${item.status}</td>
             </tr>
@@ -67,7 +96,6 @@ async function loadApplications(){
     });
 
     document.getElementById("table").innerHTML = html;
-
 }
 
 </script>
