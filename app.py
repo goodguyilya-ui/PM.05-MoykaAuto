@@ -202,6 +202,12 @@ def create_application():
             "message": "Заявка создана"
         })
 
+    except sqlite3.IntegrityError:
+
+        return jsonify({
+            "error": "Заявка с таким VIN на эту дату уже существует"
+        }), 400
+
     except Exception as e:
 
         return jsonify({
